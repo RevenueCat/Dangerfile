@@ -1,6 +1,6 @@
 #### HELPER METHODS
 def fail_if_no_supported_label_found
-  supported_types = ["breaking", "build", "ci", "docs", "feat", "fix", "perf", "refactor", "style", "test", "next_release", "dependencies"]
+  supported_types = ["breaking", "build", "ci", "docs", "feat", "fix", "perf", "refactor", "style", "test", "next_release", "dependencies", "phc_dependencies"]
 
   supported_labels_in_pr = supported_types & github.pr_labels
   no_supported_label = supported_labels_in_pr.empty?
@@ -21,6 +21,7 @@ def fail_if_no_supported_label_found
   | *test* | Adding missing tests or correcting existing tests |
   | *next_release* | Preparing a new release |
   | *dependencies* | Updating a dependency |
+  | *phc_dependencies* | Updating purchases-hybrid-common dependency |
   MARKDOWN
   end
 end
