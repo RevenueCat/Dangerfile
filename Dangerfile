@@ -1,6 +1,6 @@
 #### HELPER METHODS
 def fail_if_no_supported_label_found
-  supported_types = ["breaking", "build", "ci", "docs", "feat", "fix", "perf", "refactor", "style", "test", "next_release", "dependencies", "phc_dependencies"]
+  supported_types = ["breaking", "build", "ci", "docs", "feat", "fix", "perf", "refactor", "RevenueCatUI", "style", "test", "next_release", "dependencies", "phc_dependencies"]
 
   supported_labels_in_pr = supported_types & github.pr_labels
   no_supported_label = supported_labels_in_pr.empty?
@@ -16,6 +16,7 @@ def fail_if_no_supported_label_found
   | *feat* | A new feature |
   | *fix* | A bug fix |
   | *perf* | A code change that improves performance |
+  | *RevenueCatUI* | A change to the RevenueCatUI library |
   | *refactor* | A code change that neither fixes a bug nor adds a feature |
   | *style* | Changes that don't affect the meaning of the code (white-space, formatting, missing semi-colons, etc |
   | *test* | Adding missing tests or correcting existing tests |
