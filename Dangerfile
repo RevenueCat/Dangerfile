@@ -39,9 +39,11 @@ def check_pr_size_increase
 
   message("Total size increase: #{total_size_increase} bytes")
   if total_size_increase > FAIL_SIZE_INCREASE
-    fail("This PR increases the repo size by more than #{'%.2f' % toKB(FAIL_SIZE_INCREASE)} KB (increased by #{'%.2f' % toKB(total_size_increase)} KB).")
+    fail("This PR increases the repo size by more than #{'%.2f' % toKB(FAIL_SIZE_INCREASE)} KB " \
+    "(increased by #{'%.2f' % toKB(total_size_increase)} KB).")
   elsif total_size_increase > WARN_SIZE_INCREASE
-    warn("This PR increases the repo size by more than #{'%.2f' % toKB(WARN_SIZE_INCREASE)} KB (increased by #{'%.2f' % toKB(total_size_increase)} KB).")
+    warn("This PR increases the repo size by more than #{'%.2f' % toKB(WARN_SIZE_INCREASE)} KB "
+    "(increased by #{'%.2f' % toKB(total_size_increase)} KB).")
   else
     message("Size check passed.")
   end
