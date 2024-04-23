@@ -1,3 +1,5 @@
+require 'shellwords'
+
 #### GITHUB LABEL CHECK
 def fail_if_no_supported_label_found
   supported_types = ["breaking", "build", "ci", "docs", "feat", "fix", "perf", "refactor", "RevenueCatUI", "style", "test", "next_release", "dependencies", "phc_dependencies"]
@@ -37,13 +39,12 @@ def check_pr_size_increase
   added_and_modified_files = git.added_files + git.modified_files
   total_size_increase = calculate_total_size_increase(added_and_modified_files)
 
-  message("Total size increase: #{total_size_increase} bytes")
   if total_size_increase > FAIL_SIZE_INCREASE
-    fail("This PR increases the repo size by more than #{'%.2f' % toKB(FAIL_SIZE_INCREASE)} KB (increased by #{'%.2f' % toKB(total_size_increase)} KB).")
+    fail("This PR increases the size of the repo by more than #{'%.2f' % toKB(FAIL_SIZE_INCREASE)} KB (increased by #{'%.2f' % toKB(total_size_increase)} KB).")
   elsif total_size_increase > WARN_SIZE_INCREASE
-    warn("This PR increases the repo size by more than #{'%.2f' % toKB(WARN_SIZE_INCREASE)} KB (increased by #{'%.2f' % toKB(total_size_increase)} KB).")
+    warn("This PR increases the size of the repo by more than #{'%.2f' % toKB(WARN_SIZE_INCREASE)} KB (increased by #{'%.2f' % toKB(total_size_increase)} KB).")
   else
-    message("Size check passed.")
+    message("Size increase: #{'%.2f' % toKB(total_size_increase)} KB")
   end
 end
 
@@ -57,7 +58,6 @@ def calculate_total_size_increase(files)
     file_size_in_branch = size_of_file(file)
     file_size_in_main = size_of_file_in_main(file)
     size_increase = file_size_in_branch - file_size_in_main
-      message("Size increase for #{file}: #{'%.2f' % toKB(size_increase)} KB")
     total_increase += size_increase if size_increase > 0
   end
   total_increase
