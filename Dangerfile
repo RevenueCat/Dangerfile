@@ -35,12 +35,28 @@ end
 WARN_SIZE_INCREASE = 102400  # 100kb
 FAIL_SIZE_INCREASE = 256000  # 250kb
 
+# Bypass
+BYPASS_LABEL = "danger-bypass-size-limit"
+
 def check_pr_size_increase
   added_and_modified_files = git.added_files + git.modified_files
   total_size_increase = calculate_total_size_increase(added_and_modified_files)
 
+  bypass_size_check = github.pr_labels.any? { |s| s == BYPASS_LABEL }
+
+  if bypass_size_check
+    warn("Size check is being bypassed due to the presence of the label \"#{BYPASS_LABEL}\"")
+    if total_size_increase > WARN_SIZE_INCREASE
+      warn("Size increase: #{'%.2f' % toKB(total_size_increase)} KB")
+    else
+      message("Size increase: #{'%.2f' % toKB(total_size_increase)} KB")
+    end
+    return
+  end
+
   if total_size_increase > FAIL_SIZE_INCREASE
     fail("This PR increases the size of the repo by more than #{'%.2f' % toKB(FAIL_SIZE_INCREASE)} KB (increased by #{'%.2f' % toKB(total_size_increase)} KB).")
+    message("You can bypass the size check failure by adding the label \"#{BYPASS_LABEL}\". Please exercise caution.")
   elsif total_size_increase > WARN_SIZE_INCREASE
     warn("This PR increases the size of the repo by more than #{'%.2f' % toKB(WARN_SIZE_INCREASE)} KB (increased by #{'%.2f' % toKB(total_size_increase)} KB).")
   else
