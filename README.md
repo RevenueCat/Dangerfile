@@ -5,6 +5,7 @@ Checks for certain rules and warns if needed. Some rules can be disabled by usin
 ## Rules
 
 - Check to see if the PR is labeled with one of the supported GitHub PR labels
+- Check to see if the PR increases the size of the repo (in bytes) by more than thresholds defined in the file.
 
 ## License
 
