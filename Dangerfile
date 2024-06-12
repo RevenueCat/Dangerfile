@@ -45,11 +45,8 @@ def check_pr_size_increase
   bypass_size_check = github.pr_labels.any? { |s| s == BYPASS_LABEL }
 
   if bypass_size_check
-    warn("Size check is being bypassed due to the presence of the label \"#{BYPASS_LABEL}\"")
     if total_size_increase > WARN_SIZE_INCREASE
       warn("Size increase: #{'%.2f' % toKB(total_size_increase)} KB")
-    else
-      message("Size increase: #{'%.2f' % toKB(total_size_increase)} KB")
     end
     return
   end
@@ -59,8 +56,6 @@ def check_pr_size_increase
     message("You can bypass the size check failure by adding the label \"#{BYPASS_LABEL}\". Please exercise caution.")
   elsif total_size_increase > WARN_SIZE_INCREASE
     warn("This PR increases the size of the repo by more than #{'%.2f' % toKB(WARN_SIZE_INCREASE)} KB (increased by #{'%.2f' % toKB(total_size_increase)} KB).")
-  else
-    message("Size increase: #{'%.2f' % toKB(total_size_increase)} KB")
   end
 end
 
