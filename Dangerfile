@@ -2,7 +2,7 @@ require 'shellwords'
 
 #### GITHUB LABEL CHECK
 def fail_if_no_supported_label_found
-  supported_types = ["breaking", "build", "ci", "docs", "feat", "fix", "perf", "refactor", "RevenueCatUI", "style", "test", "next_release", "dependencies", "phc_dependencies"]
+  supported_types = ["breaking", "build", "ci", "docs", "feat", "fix", "perf", "refactor", "RevenueCatUI", "style", "test", "next_release", "dependencies", "phc_dependencies", "internal", "other"]
   supported_types += supported_types.map { |type| "pr:#{type}" }
 
   supported_labels_in_pr = supported_types & github.pr_labels
@@ -26,6 +26,8 @@ def fail_if_no_supported_label_found
   | *next_release* or *pr:next_release* | Preparing a new release |
   | *dependencies* or *pr:dependencies* | Updating a dependency |
   | *phc_dependencies* or *pr:phc_dependencies* | Updating purchases-hybrid-common dependency |
+  | *pr:internal* | Changes to internal code that's not relevant to developers outside of RevenueCat |
+  | *pr:other* | Other changes. Catch-all for anything that doesn't fit the above categories. |
   MARKDOWN
   end
 end
