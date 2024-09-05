@@ -3,6 +3,7 @@ require 'shellwords'
 #### GITHUB LABEL CHECK
 def fail_if_no_supported_label_found
   supported_types = ["breaking", "build", "ci", "docs", "feat", "fix", "perf", "refactor", "RevenueCatUI", "style", "test", "next_release", "dependencies", "phc_dependencies"]
+  supported_types += supported_types.map { |type| "pr:#{type}" }
 
   supported_labels_in_pr = supported_types & github.pr_labels
   no_supported_label = supported_labels_in_pr.empty?
@@ -11,20 +12,20 @@ def fail_if_no_supported_label_found
     markdown <<-MARKDOWN
   | Label | Description |
   |-------|-------------|
-  | *breaking* | Changes that are breaking |
-  | *build* | Changes that affect the build system |
-  | *ci* | Changes to our CI configuration files and scripts |
-  | *docs* | Documentation only changes |
-  | *feat* | A new feature |
-  | *fix* | A bug fix |
-  | *perf* | A code change that improves performance |
-  | *RevenueCatUI* | A change to the RevenueCatUI library |
-  | *refactor* | A code change that neither fixes a bug nor adds a feature |
-  | *style* | Changes that don't affect the meaning of the code (white-space, formatting, missing semi-colons, etc |
-  | *test* | Adding missing tests or correcting existing tests |
-  | *next_release* | Preparing a new release |
-  | *dependencies* | Updating a dependency |
-  | *phc_dependencies* | Updating purchases-hybrid-common dependency |
+  | *breaking* or *pr:breaking* | Changes that are breaking |
+  | *build* or *pr:build* | Changes that affect the build system |
+  | *ci* or *pr:ci* | Changes to our CI configuration files and scripts |
+  | *docs* or *pr:docs* | Documentation only changes |
+  | *feat* or *pr:feat* | A new feature |
+  | *fix* or *pr:fix* | A bug fix |
+  | *perf* or *pr:perf* | A code change that improves performance |
+  | *RevenueCatUI* or *pr:RevenueCatUI* | A change to the RevenueCatUI library |
+  | *refactor* or *pr:refactor* | A code change that neither fixes a bug nor adds a feature |
+  | *style* or *pr:style* | Changes that don't affect the meaning of the code (white-space, formatting, missing semi-colons, etc |
+  | *test* or *pr:test* | Adding missing tests or correcting existing tests |
+  | *next_release* or *pr:next_release* | Preparing a new release |
+  | *dependencies* or *pr:dependencies* | Updating a dependency |
+  | *phc_dependencies* or *pr:phc_dependencies* | Updating purchases-hybrid-common dependency |
   MARKDOWN
   end
 end
