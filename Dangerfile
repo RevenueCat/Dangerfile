@@ -12,20 +12,20 @@ def fail_if_no_supported_label_found
     markdown <<-MARKDOWN
   | Label | Description |
   |-------|-------------|
-  | *breaking* or *pr:breaking* | Changes that are breaking |
-  | *build* or *pr:build* | Changes that affect the build system |
-  | *ci* or *pr:ci* | Changes to our CI configuration files and scripts |
-  | *docs* or *pr:docs* | Documentation only changes |
-  | *feat* or *pr:feat* | A new feature |
-  | *fix* or *pr:fix* | A bug fix |
-  | *perf* or *pr:perf* | A code change that improves performance |
-  | *RevenueCatUI* or *pr:RevenueCatUI* | A change to the RevenueCatUI library |
-  | *refactor* or *pr:refactor* | A code change that neither fixes a bug nor adds a feature |
-  | *style* or *pr:style* | Changes that don't affect the meaning of the code (white-space, formatting, missing semi-colons, etc |
-  | *test* or *pr:test* | Adding missing tests or correcting existing tests |
-  | *next_release* or *pr:next_release* | Preparing a new release |
-  | *dependencies* or *pr:dependencies* | Updating a dependency |
-  | *phc_dependencies* or *pr:phc_dependencies* | Updating purchases-hybrid-common dependency |
+  | *pr:breaking* | Changes that are breaking |
+  | *pr:build* | Changes that affect the build system |
+  | *pr:ci* | Changes to our CI configuration files and scripts |
+  | *pr:docs* | Documentation only changes |
+  | *pr:feat* | A new feature |
+  | *pr:fix* | A bug fix |
+  | *pr:perf* | A code change that improves performance |
+  | *pr:RevenueCatUI* | A change to the RevenueCatUI library |
+  | *pr:refactor* | A code change that neither fixes a bug nor adds a feature |
+  | *pr:style* | Changes that don't affect the meaning of the code (white-space, formatting, missing semi-colons, etc |
+  | *pr:test* | Adding missing tests or correcting existing tests |
+  | *pr:next_release* | Preparing a new release |
+  | *pr:dependencies* | Updating a dependency |
+  | *pr:phc_dependencies* | Updating purchases-hybrid-common dependency |
   MARKDOWN
   end
 end
