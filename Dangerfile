@@ -2,32 +2,30 @@ require 'shellwords'
 
 #### GITHUB LABEL CHECK
 def fail_if_no_supported_label_found
-  supported_types = ["breaking", "build", "ci", "docs", "feat", "fix", "perf", "refactor", "RevenueCatUI", "style", "test", "next_release", "dependencies", "phc_dependencies", "internal", "other"]
+  supported_types = ["feat", "fix", "RevenueCatUI", "next_release", "dependencies", "phc_dependencies", "other"]
   supported_types += supported_types.map { |type| "pr:#{type}" }
 
   supported_labels_in_pr = supported_types & github.pr_labels
   no_supported_label = supported_labels_in_pr.empty?
-  if no_supported_label
-    fail("Label the PR using one of the change type labels")
+  only_revenuecatui = supported_labels_in_pr == ["pr:RevenueCatUI"]
+
+  if no_supported_label || only_revenuecatui
+    fail_message = if only_revenuecatui
+                     "The PR is tagged with pr:RevenueCatUI only. Please add another appropriate label."
+                   else
+                     "Label the PR using one of the change type labels. If you are not sure which label to use, choose *pr:other*."
+                   end
+    fail(fail_message)
     markdown <<-MARKDOWN
   | Label | Description |
   |-------|-------------|
-  | *breaking* or *pr:breaking* | Changes that are breaking |
-  | *build* or *pr:build* | Changes that affect the build system |
-  | *ci* or *pr:ci* | Changes to our CI configuration files and scripts |
-  | *docs* or *pr:docs* | Documentation only changes |
-  | *feat* or *pr:feat* | A new feature |
-  | *fix* or *pr:fix* | A bug fix |
-  | *perf* or *pr:perf* | A code change that improves performance |
-  | *RevenueCatUI* or *pr:RevenueCatUI* | A change to the RevenueCatUI library |
-  | *refactor* or *pr:refactor* | A code change that neither fixes a bug nor adds a feature |
-  | *style* or *pr:style* | Changes that don't affect the meaning of the code (white-space, formatting, missing semi-colons, etc |
-  | *test* or *pr:test* | Adding missing tests or correcting existing tests |
-  | *next_release* or *pr:next_release* | Preparing a new release |
-  | *dependencies* or *pr:dependencies* | Updating a dependency |
-  | *phc_dependencies* or *pr:phc_dependencies* | Updating purchases-hybrid-common dependency |
-  | *pr:internal* | Changes to internal code that's not relevant to developers outside of RevenueCat |
-  | *pr:other* | Other changes. Catch-all for anything that doesn't fit the above categories. |
+  | *pr:feat* | A new feature. Use along with pr:breaking to force a major release. |
+  | *pr:fix* | A bug fix. Use along with pr:force_minor to force a minor release. |
+  | *pr:other* | Other changes. Catch-all for anything that doesn't fit the above categories. Releases that only contain this label will not be released. Use along with pr:force_patch, or pr:force_minor to force a patch or minor release. |
+  | *pr:RevenueCatUI* | Use along any other tag to mark a PR that only contains RevenueCatUI changes |
+  | *pr:next_release* | Preparing a new release |
+  | *pr:dependencies* | Updating a dependency |
+  | *pr:phc_dependencies* | Updating purchases-hybrid-common dependency |
   MARKDOWN
   end
 end
