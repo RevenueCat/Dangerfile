@@ -78,7 +78,7 @@ end
 
 # File size in the current branch
 def size_of_file(file_path)
-  if File.exists?(file_path)
+  if File.exist?(file_path)
     File.size(file_path)
   else
     0
