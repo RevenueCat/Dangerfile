@@ -37,8 +37,10 @@ end
 # "trigger" => ["r1","r2"]       # multiple required labels
 REQUIRED_LABEL_MAP = {
   "feat:Customer Center" => "pr:RevenueCatUI",
+  "feat:Paywall Components" => "pr:RevenueCatUI",
+  "feat:PaywallV2" => "pr:RevenueCatUI",
+
   # Add more mappings here:
-  # "feat:Payments" => ["pr:RevenueCatUI", "pr:next_release"]
 }
 
 def fail_if_required_labels_missing
