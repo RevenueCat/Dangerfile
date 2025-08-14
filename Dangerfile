@@ -26,15 +26,56 @@ def fail_if_no_supported_label_found
   | *pr:next_release* | Preparing a new release |
   | *pr:dependencies* | Updating a dependency |
   | *pr:phc_dependencies* | Updating purchases-hybrid-common dependency |
-  MARKDOWN
+    MARKDOWN
+  end
+end
+
+#### AUTO-LABEL MAPPINGS
+# Map existing labels to labels we want to auto-add.
+# Supports String or Array as a value:
+# "trigger" => "target"        # one target
+# "trigger" => ["t1","t2"]     # many targets
+AUTO_LABEL_MAP = {
+  "feat:Customer Center" => "pr:RevenueCatUI",
+  # Add more mappings here:
+  # "feat:Payments" => ["pr:RevenueCatUI", "pr:next_release"]
+}
+
+def repo_full_name
+  # Prefer base (destination repo), fallback to head (forks)
+  base = github.pr_json[:base] && github.pr_json[:base][:repo] && github.pr_json[:base][:repo][:full_name]
+  head = github.pr_json[:head] && github.pr_json[:head][:repo] && github.pr_json[:head][:repo][:full_name]
+  base || head
+end
+
+def ensure_labels_from_mapping
+  # Normalize possible "feat: Something" vs "feat:Something"
+  normalized_labels = github.pr_labels.map { |l| l.gsub(": ", ":") }
+
+  AUTO_LABEL_MAP.each do |trigger, targets|
+    targets = Array(targets) # allow string or array
+    has_trigger = normalized_labels.include?(trigger.gsub(": ", ":"))
+    next unless has_trigger
+
+    to_add = targets.reject { |t| normalized_labels.include?(t) }
+    next if to_add.empty?
+
+    github.api.add_labels_to_an_issue(
+      repo_full_name,
+      github.pr_json[:number],
+      to_add
+    )
+    message(%(Added label(s) #{to_add.map { |l| %("#{l}") }.join(", ")} because "#{trigger}" is present.))
+    # Update our local view to avoid re-adding in the same run
+    normalized_labels.concat(to_add)
   end
 end
 
 #### PR SIZE INCREASE CHECK
 
 # Thresholds
-WARN_SIZE_INCREASE = 102400  # 100kb
-FAIL_SIZE_INCREASE = 256000  # 250kb
+WARN_SIZE_INCREASE = 102_400  # 100kb
+FAIL_SIZE_INCREASE = 256_000  # 250kb
 
 # Bypass
 BYPASS_LABEL = "danger-bypass-size-limit"
@@ -96,6 +137,9 @@ def size_of_file_in_main(file)
 end
 
 #### ENTRY POINT
+
+# Auto-add mapped labels if triggers are present
+ensure_labels_from_mapping
 
 # Fail when GitHub PR label is missing
 fail_if_no_supported_label_found
