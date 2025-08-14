@@ -30,44 +30,30 @@ def fail_if_no_supported_label_found
   end
 end
 
-#### AUTO-LABEL MAPPINGS
-# Map existing labels to labels we want to auto-add.
+#### REQUIRED LABEL MAPPINGS
+# Map trigger labels to required labels that must be present.
 # Supports String or Array as a value:
-# "trigger" => "target"        # one target
-# "trigger" => ["t1","t2"]     # many targets
-AUTO_LABEL_MAP = {
+# "trigger" => "required"        # one required label
+# "trigger" => ["r1","r2"]       # multiple required labels
+REQUIRED_LABEL_MAP = {
   "feat:Customer Center" => "pr:RevenueCatUI",
   # Add more mappings here:
   # "feat:Payments" => ["pr:RevenueCatUI", "pr:next_release"]
 }
 
-def repo_full_name
-  # Prefer base (destination repo), fallback to head (forks)
-  base = github.pr_json[:base] && github.pr_json[:base][:repo] && github.pr_json[:base][:repo][:full_name]
-  head = github.pr_json[:head] && github.pr_json[:head][:repo] && github.pr_json[:head][:repo][:full_name]
-  base || head
-end
-
-def ensure_labels_from_mapping
+def fail_if_required_labels_missing
   # Normalize possible "feat: Something" vs "feat:Something"
   normalized_labels = github.pr_labels.map { |l| l.gsub(": ", ":") }
 
-  AUTO_LABEL_MAP.each do |trigger, targets|
-    targets = Array(targets) # allow string or array
+  REQUIRED_LABEL_MAP.each do |trigger, required|
+    required = Array(required) # allow string or array
     has_trigger = normalized_labels.include?(trigger.gsub(": ", ":"))
     next unless has_trigger
 
-    to_add = targets.reject { |t| normalized_labels.include?(t) }
-    next if to_add.empty?
+    missing_required = required.reject { |r| normalized_labels.include?(r) }
+    next if missing_required.empty?
 
-    github.api.add_labels_to_an_issue(
-      repo_full_name,
-      github.pr_json[:number],
-      to_add
-    )
-    message(%(Added label(s) #{to_add.map { |l| %("#{l}") }.join(", ")} because "#{trigger}" is present.))
-    # Update our local view to avoid re-adding in the same run
-    normalized_labels.concat(to_add)
+    fail(%(PR has label "#{trigger}" but is missing required label(s): #{missing_required.map { |l| %("#{l}") }.join(", ")}.))
   end
 end
 
@@ -138,8 +124,8 @@ end
 
 #### ENTRY POINT
 
-# Auto-add mapped labels if triggers are present
-ensure_labels_from_mapping
+# Fail when required label mappings are missing
+fail_if_required_labels_missing
 
 # Fail when GitHub PR label is missing
 fail_if_no_supported_label_found
