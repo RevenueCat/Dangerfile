@@ -26,15 +26,44 @@ def fail_if_no_supported_label_found
   | *pr:next_release* | Preparing a new release |
   | *pr:dependencies* | Updating a dependency |
   | *pr:phc_dependencies* | Updating purchases-hybrid-common dependency |
-  MARKDOWN
+    MARKDOWN
+  end
+end
+
+#### REQUIRED LABEL MAPPINGS
+# Map trigger labels to required labels that must be present.
+# Supports String or Array as a value:
+# "trigger" => "required"        # one required label
+# "trigger" => ["r1","r2"]       # multiple required labels
+REQUIRED_LABEL_MAP = {
+  "feat:Customer Center" => "pr:RevenueCatUI",
+  "feat:Paywall Components" => "pr:RevenueCatUI",
+  "feat:PaywallV2" => "pr:RevenueCatUI",
+
+  # Add more mappings here:
+}
+
+def fail_if_required_labels_missing
+  # Normalize possible "feat: Something" vs "feat:Something"
+  normalized_labels = github.pr_labels.map { |l| l.gsub(": ", ":") }
+
+  REQUIRED_LABEL_MAP.each do |trigger, required|
+    required = Array(required) # allow string or array
+    has_trigger = normalized_labels.include?(trigger.gsub(": ", ":"))
+    next unless has_trigger
+
+    missing_required = required.reject { |r| normalized_labels.include?(r) }
+    next if missing_required.empty?
+
+    fail(%(PR has label "#{trigger}" but is missing required label(s): #{missing_required.map { |l| %("#{l}") }.join(", ")}.))
   end
 end
 
 #### PR SIZE INCREASE CHECK
 
 # Thresholds
-WARN_SIZE_INCREASE = 102400  # 100kb
-FAIL_SIZE_INCREASE = 256000  # 250kb
+WARN_SIZE_INCREASE = 102_400  # 100kb
+FAIL_SIZE_INCREASE = 256_000  # 250kb
 
 # Bypass
 BYPASS_LABEL = "danger-bypass-size-limit"
@@ -99,6 +128,9 @@ end
 
 # Fail when GitHub PR label is missing
 fail_if_no_supported_label_found
+
+# Fail when required label mappings are missing
+fail_if_required_labels_missing
 
 # Fail/warn when PR size increase exceeds threshold
 check_pr_size_increase
