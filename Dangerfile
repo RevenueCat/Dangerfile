@@ -126,11 +126,11 @@ end
 
 #### ENTRY POINT
 
-# Fail when required label mappings are missing
-fail_if_required_labels_missing
-
 # Fail when GitHub PR label is missing
 fail_if_no_supported_label_found
+
+# Fail when required label mappings are missing
+fail_if_required_labels_missing
 
 # Fail/warn when PR size increase exceeds threshold
 check_pr_size_increase
