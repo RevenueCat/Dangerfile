@@ -26,6 +26,7 @@ def fail_if_no_supported_label_found
   | *pr:next_release* | Preparing a new release |
   | *pr:dependencies* | Updating a dependency |
   | *pr:phc_dependencies* | Updating purchases-hybrid-common dependency |
+  | *pr:changelog_ignore* | The PR will not be included in the changelog. This label doesn't determine the type of bump of the version and can be combined with `pr:feat`, `pr:fix` or `pr:other`. |
     MARKDOWN
   end
 end
