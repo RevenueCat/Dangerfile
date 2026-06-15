@@ -127,7 +127,8 @@ end
 
 #### GENERATED FILE GUARD
 # Fail PRs that hand-edit generated files (repos pass the protected file/dir paths);
-# codegen PRs bypass via `label`.
+# codegen PRs bypass via `label`. 
+# Not called automatically by this Dangerfile, must be called by consumers.
 def fail_on_generated_edits(paths, label: "pr:auto_codegen")
   edited = (git.modified_files + git.added_files).uniq.select do |file|
     paths.any? do |path|
