@@ -125,6 +125,25 @@ def size_of_file_in_main(file)
   end
 end
 
+#### GENERATED FILE GUARD
+# Fail PRs that hand-edit generated files (repos pass the protected file/dir paths);
+# codegen PRs bypass via `label`.
+def fail_on_generated_edits(paths, label: "pr:auto_codegen")
+  edited = (git.modified_files + git.added_files).uniq.select do |file|
+    paths.any? do |path|
+      dir = path.end_with?("/") ? path : "#{path}/"
+      file == path || file.start_with?(dir)
+    end
+  end
+  return if edited.empty? || github.pr_labels.include?(label)
+
+  fail(
+    "This PR edits generated file(s) that must not be hand-edited: #{edited.join(', ')}. " \
+    "They are produced upstream (e.g. by purchases-error-codes); automated updates carry " \
+    "the `#{label}` label."
+  )
+end
+
 #### ENTRY POINT
 
 # Fail when GitHub PR label is missing
