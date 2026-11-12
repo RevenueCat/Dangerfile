@@ -145,6 +145,34 @@ def fail_on_generated_edits(paths, label: "pr:auto_codegen")
   )
 end
 
+#### DIRECT GITHUB API CALL CHECK
+# Fastfiles must go through fastlane-plugin-revenuecat_internal's helper so every GitHub API call
+# gets its error handling and rate-limit retries.
+def fail_on_direct_github_api_calls
+  fastlane_files = (git.modified_files + git.added_files).uniq.select do |file|
+    file.start_with?("fastlane/") || File.basename(file) == "Fastfile"
+  end
+
+  offending = fastlane_files.select do |file|
+    diff = git.diff_for_file(file)
+    next false unless diff
+
+    diff.patch.each_line.any? do |line|
+      next false unless line.start_with?("+") && !line.start_with?("+++")
+      next false if line.match?(/\A\+\s*#/)
+
+      line.match?(/\bgithub_api\b|\bGithubApiAction\b/)
+    end
+  end
+  return if offending.empty?
+
+  fail(
+    "This PR adds direct `github_api` calls in #{offending.join(', ')}. " \
+    "Use `Fastlane::Helper::GitHubHelper.github_api_call_with_retry` from " \
+    "fastlane-plugin-revenuecat_internal instead."
+  )
+end
+
 #### ENTRY POINT
 
 # Fail when GitHub PR label is missing
@@ -155,3 +183,6 @@ fail_if_required_labels_missing
 
 # Fail/warn when PR size increase exceeds threshold
 check_pr_size_increase
+
+# Fail when Fastfiles call the GitHub API directly
+fail_on_direct_github_api_calls
