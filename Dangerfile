@@ -60,6 +60,18 @@ def fail_if_required_labels_missing
   end
 end
 
+#### PATHS
+# Danger lists files relative to the repository root, and runs from the SDK's folder, which is a
+# subfolder of the repository in the monorepo.
+
+def repository_root
+  @repository_root ||= `git rev-parse --show-toplevel`.strip
+end
+
+def sdk_folder_prefix
+  @sdk_folder_prefix ||= `git rev-parse --show-prefix`.strip
+end
+
 #### PR SIZE INCREASE CHECK
 
 # Thresholds
@@ -108,8 +120,9 @@ end
 
 # File size in the current branch
 def size_of_file(file_path)
-  if File.exist?(file_path)
-    File.size(file_path)
+  full_path = File.join(repository_root, file_path)
+  if File.exist?(full_path)
+    File.size(full_path)
   else
     0
   end
@@ -132,6 +145,7 @@ end
 def fail_on_generated_edits(paths, label: "pr:auto_codegen")
   edited = (git.modified_files + git.added_files).uniq.select do |file|
     paths.any? do |path|
+      path = "#{sdk_folder_prefix}#{path}"
       dir = path.end_with?("/") ? path : "#{path}/"
       file == path || file.start_with?(dir)
     end
@@ -150,7 +164,7 @@ end
 # gets its error handling and rate-limit retries.
 def fail_on_direct_github_api_calls
   fastlane_files = (git.modified_files + git.added_files).uniq.select do |file|
-    file.start_with?("fastlane/") || File.basename(file) == "Fastfile"
+    file.start_with?("#{sdk_folder_prefix}fastlane/") || File.basename(file) == "Fastfile"
   end
 
   offending = fastlane_files.select do |file|
